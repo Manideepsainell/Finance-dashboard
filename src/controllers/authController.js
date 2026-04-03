@@ -66,7 +66,89 @@ const registerUser = async (req, res) => {
 
 }
 };
+const loginUser = async (req,res)=>{
 
+    try{
+
+        const {email,password} = req.body;
+
+        // check input
+        if(!email || !password){
+
+            return res.status(400).json({
+                success:false,
+                message:"Email and password required"
+            });
+
+        }
+
+        // find user
+        const user = await User.findOne({email});
+
+        if(!user){
+
+            return res.status(400).json({
+                success:false,
+                message:"Invalid credentials"
+            });
+
+        }
+
+        // compare password
+        const isMatch = await user.comparePassword(password);
+
+        if(!isMatch){
+
+            return res.status(400).json({
+                success:false,
+                message:"Invalid credentials"
+            });
+
+        }
+
+        // generate token
+        const token = jwt.sign(
+
+            {
+                userId:user._id,
+                role:user.role
+            },
+
+            process.env.JWT_SECRET,
+
+            {
+                expiresIn:"1d"
+            }
+
+        );
+
+        res.json({
+
+            success:true,
+
+            token,
+
+            user:{
+                id:user._id,
+                name:user.name,
+                email:user.email,
+                role:user.role
+            }
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+        res.status(500).json({
+            success:false,
+            message:error.message
+        });
+
+    }
+
+};
 module.exports = {
-  registerUser,
+  registerUser,loginUser
 };
