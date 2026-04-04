@@ -158,10 +158,82 @@ const deleteRecord = async (req,res)=>{
         });
     }
 };
+const getSummary = async (req,res)=>{
+
+    try{
+
+        // only admin
+        if(req.user.role !== "ADMIN"){
+
+            return res.status(403).json({
+                success:false,
+                message:"Admin access required"
+            });
+
+        }
+
+        const summary = await FinancialRecord.aggregate([
+
+            {
+                $match:{isDeleted:false}
+            },
+
+            {
+                $group:{
+                    _id:"$type",
+                    total:{$sum:"$amount"}
+                }
+            }
+
+        ]);
+
+        let totalCredit = 0;
+        let totalDebit = 0;
+
+        summary.forEach(item => {
+
+            if(item._id === "credit"){
+                totalCredit = item.total;
+            }
+
+            if(item._id === "debit"){
+                totalDebit = item.total;
+            }
+
+        });
+
+        res.json({
+
+            success:true,
+
+            data:{
+                totalCredit,
+                totalDebit,
+                balance: totalCredit - totalDebit
+            }
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+        res.status(500).json({
+
+            success:false,
+
+            message:error.message
+
+        });
+
+    }
+
+};
 
 module.exports = {
     createRecord,
     getRecords,
     getSingleRecord,
-    deleteRecord
+    deleteRecord,
+    getSummary
 };
