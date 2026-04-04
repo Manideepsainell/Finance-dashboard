@@ -190,6 +190,110 @@ const deleteRecord = async (req,res)=>{
         });
     }
 };
+const updateRecord = async (req,res)=>{
+
+    try{
+
+        if(!mongoose.Types.ObjectId.isValid(req.params.id)){
+
+            return res.status(400).json({
+                success:false,
+                message:"Invalid record ID"
+            });
+
+        }
+
+        const record = await FinancialRecord.findById(req.params.id);
+
+        if(!record || record.isDeleted){
+
+            return res.status(404).json({
+                success:false,
+                message:"Record not found"
+            });
+
+        }
+
+        // access control
+        if(req.user.role !== "ADMIN"){
+
+            if(record.userId.toString() !== req.user.userId){
+
+                return res.status(403).json({
+                    success:false,
+                    message:"Not authorized"
+                });
+
+            }
+
+        }
+
+        const {amount,category,description,type} = req.body;
+
+        // update fields only if provided
+
+        if(amount !== undefined){
+
+            if(amount <=0){
+                return res.status(400).json({
+                    success:false,
+                    message:"Amount must be positive"
+                });
+            }
+
+            record.amount = amount;
+        }
+
+        if(category){
+            record.category = category;
+        }
+
+        if(description){
+            record.description = description;
+        }
+
+        if(type){
+
+            if(!["credit","debit"].includes(type)){
+
+                return res.status(400).json({
+                    success:false,
+                    message:"Invalid type"
+                });
+
+            }
+
+            record.type = type;
+
+        }
+
+        await record.save();
+
+        res.json({
+
+            success:true,
+
+            message:"Record updated",
+
+            data:record
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+        res.status(500).json({
+
+            success:false,
+
+            message:error.message
+
+        });
+
+    }
+
+};
 const getSummary = async (req,res)=>{
 
     try{
@@ -266,6 +370,7 @@ module.exports = {
     createRecord,
     getRecords,
     getSingleRecord,
+    updateRecord,
     deleteRecord,
     getSummary
 };
