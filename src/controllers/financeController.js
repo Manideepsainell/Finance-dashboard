@@ -5,12 +5,20 @@ const createRecord = async (req,res)=>{
     try{
         const {amount,type,category,description} = req.body;
 
-        if(!amount || !type || !category){
+     if(amount === undefined || !type || !category){
             return res.status(400).json({
                 success:false,
                 message:"Required fields missing"
             });
         }
+        if(typeof amount !== "number"){
+
+    return res.status(400).json({
+        success:false,
+        message:"Amount must be a number"
+    });
+
+}
 
         if(amount <=0){
             return res.status(400).json({
@@ -18,6 +26,30 @@ const createRecord = async (req,res)=>{
                 message:"Amount must be positive"
             });
         }
+        if(!["credit","debit"].includes(type)){
+
+    return res.status(400).json({
+        success:false,
+        message:"Type must be credit or debit"
+    });
+
+}
+if(category.length < 3){
+
+    return res.status(400).json({
+        success:false,
+        message:"Category too short"
+    });
+
+}
+if(description && description.length > 200){
+
+    return res.status(400).json({
+        success:false,
+        message:"Description too long"
+    });
+
+}
 
         const record = await FinancialRecord.create({
             userId:req.user.userId,
@@ -47,12 +79,12 @@ const getRecords = async (req,res)=>{
         let records;
 
         if(req.user.role === "ADMIN"){
-            records = await FinancialRecord.find({ isDeleted:false });
+            records = (await FinancialRecord.find({ isDeleted:false }).sort({createdAt:-1}));
         }else{
             records = await FinancialRecord.find({
                 userId:req.user.userId,
                 isDeleted:false
-            });
+            }).sort({createdAt:-1});
         }
 
         res.json({
