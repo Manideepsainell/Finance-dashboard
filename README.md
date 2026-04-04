@@ -1,9 +1,10 @@
-
 # Finance Dashboard Backend
 
 Backend API for a finance dashboard system that manages financial records, user roles, access control and summary analytics.
 
 Built as part of a backend engineering assessment.
+
+---
 
 ## Tech Stack
 
@@ -14,13 +15,26 @@ Built as part of a backend engineering assessment.
 - JWT Authentication
 - bcrypt password hashing
 
+---
+
+## Backend Design Highlights
+
+- Modular MVC architecture (models, controllers, routes)
+- JWT based authentication
+- Role based authorization (Admin/User)
+- MongoDB aggregation for financial analytics
+- Soft delete strategy to preserve financial history
+- Input validation and error handling
+
+---
+
 ## Features
 
 ### Authentication
 - User registration
 - User login
 - JWT based authentication
-- Role based access (Admin/User)
+- Role based access control
 
 ### Financial Records
 - Create financial record
@@ -37,8 +51,11 @@ Built as part of a backend engineering assessment.
 - Total debit calculation
 - Balance calculation
 
+---
+
 ## Project Structure
 
+```
 src/
 │
 ├── models/
@@ -59,57 +76,73 @@ src/
 ├── config/
 │   └── db.js
 │
-app.js
 server.js
+app.js
+```
+
+---
 
 ## Setup Instructions
 
 ### 1. Clone repository
 
-git clone <repo-url>
+```bash
+git clone https://github.com/Manideepsainell/Finance-dashboard.git
+cd Finance-dashboard
+```
 
 ### 2. Install dependencies
 
+```bash
 npm install
+```
 
 ### 3. Environment variables
 
-Create .env file:
+Create a `.env` file:
 
+```env
 PORT=5000
 MONGO_URI=your_mongodb_connection
-JWT_SECRET=your_secret
+JWT_SECRET=your_secret_key
+```
 
 ### 4. Run server
 
+```bash
 npm run dev
+```
+
+---
 
 ## API Endpoints
 
 ### Auth APIs
 
-POST /auth/register  
+**POST /auth/register**  
 Register new user
 
-POST /auth/login  
+**POST /auth/login**  
 Login user
 
 ### Finance APIs
 
-POST /finance  
-Create record
+**POST /finance**  
+Create financial record
 
-GET /finance  
+**GET /finance**  
 Get all records
 
-GET /finance/:id  
+**GET /finance/:id**  
 Get single record
 
-DELETE /finance/:id  
+**DELETE /finance/:id**  
 Soft delete record
 
-GET /finance/summary  
+**GET /finance/summary**  
 Get financial summary (Admin only)
+
+---
 
 ## Design Decisions
 
@@ -119,6 +152,8 @@ Get financial summary (Admin only)
 - MongoDB aggregation used for analytics calculations
 - Validation added to prevent invalid financial data
 
+---
+
 ## Assumptions
 
 - Financial amounts are always positive numbers
@@ -126,10 +161,18 @@ Get financial summary (Admin only)
 - Admin role manages analytics
 - Deleted records should not appear in queries
 
+---
+
 ## Future Improvements
 
 - Pagination support
 - Search filters
-- Unit tests
+- Unit testing
 - Rate limiting
 - API documentation using Swagger
+
+---
+
+## Author
+
+Manideep Sai
